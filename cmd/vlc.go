@@ -3,7 +3,7 @@ package cmd
 import (
 	"errors"
 	"github.com/spf13/cobra"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -30,7 +30,14 @@ func pack(_ *cobra.Command, args []string) {
 		handleErr(err)
 	}
 
-	data, err := ioutil.ReadAll(r)
+	defer func(r *os.File) {
+		err := r.Close()
+		if err != nil {
+			handleErr(err)
+		}
+	}(r)
+
+	data, err := io.ReadAll(r)
 	if err != nil {
 		handleErr(err)
 	}
